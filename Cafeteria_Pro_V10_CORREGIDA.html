@@ -1,0 +1,790 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Cafetería Pro V10 — Estudio de fotos con IA</title>
+<style>
+:root{--bg:#f5f7fb;--card:#fff;--text:#172033;--muted:#687386;--line:#e4e8ef;--primary:#111827;--accent:#2563eb;--green:#15803d;--yellow:#a16207;--red:#b91c1c}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
+button,input,select,textarea{font:inherit}button{cursor:pointer}.app{max-width:1100px;margin:auto;padding-bottom:90px}
+header{background:var(--primary);color:#fff;padding:22px 18px;position:sticky;top:0;z-index:20;box-shadow:0 2px 12px #0002}
+.headerin{max-width:1100px;margin:auto}.brand{font-size:23px;font-weight:900}.subtitle{font-size:13px;color:#cbd5e1;margin-top:4px}
+nav{display:flex;gap:7px;overflow:auto;margin-top:15px;padding-bottom:2px}nav button{border:1px solid #ffffff22;background:#ffffff0d;color:#fff;padding:10px 13px;border-radius:10px;white-space:nowrap}nav button.active{background:#fff;color:#111827}
+main{padding:18px}.page{display:none}.page.active{display:block}
+h1{font-size:25px;margin:4px 0 6px}h2{font-size:19px;margin:0 0 12px}h3{font-size:16px;margin:0 0 10px}.muted{color:var(--muted);font-size:13px}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.grid2{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;box-shadow:0 2px 8px #17203308;margin-bottom:14px}
+.kpi{font-size:25px;font-weight:900;margin-top:5px}.kpi small{font-size:12px;font-weight:600;color:var(--muted)}
+label{display:block;font-size:13px;font-weight:800;margin:12px 0 6px}input,select,textarea{width:100%;border:1px solid #cfd6e2;border-radius:10px;padding:11px 12px;background:#fff;color:var(--text);outline:none}input:focus,select:focus,textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px #2563eb18}
+.btn{border:0;border-radius:10px;padding:11px 14px;font-weight:800}.primary{background:var(--primary);color:#fff}.blue{background:var(--accent);color:#fff}.light{background:#eef2f7;color:#172033}.danger{background:#fee2e2;color:#991b1b}.success{background:#dcfce7;color:#166534}.btnrow{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+.tip{font-size:12px;color:#596579;background:#f7f9fc;border:1px solid #e8ecf2;padding:9px 10px;border-radius:9px;margin-top:7px;line-height:1.45}
+.alert{padding:11px 12px;border-radius:10px;margin:10px 0;font-size:13px;font-weight:700}.alert.ok{background:#dcfce7;color:#166534}.alert.warn{background:#fef3c7;color:#92400e}.alert.err{background:#fee2e2;color:#991b1b}
+.item{border:1px solid var(--line);border-radius:13px;padding:13px;margin-top:10px;background:#fff}.itemtop{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}.itemname{font-weight:900}.itemmeta{font-size:12px;color:var(--muted);margin-top:5px}.pill{display:inline-block;padding:4px 8px;border-radius:99px;font-size:11px;font-weight:900}.good{background:#dcfce7;color:#166534}.mid{background:#fef3c7;color:#92400e}.low{background:#fee2e2;color:#991b1b}
+.recipe{border:1px solid var(--line);border-radius:13px;padding:12px;margin-top:10px;background:#fbfcfe}.recipegrid{display:grid;grid-template-columns:1.2fr .8fr .7fr .7fr;gap:9px}.remove{float:right}.empty{padding:24px;text-align:center;color:var(--muted);border:1px dashed #cbd5e1;border-radius:13px}
+.result{background:#111827;color:#fff;border-radius:14px;padding:14px;margin-top:14px}.resultgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}.result .label{font-size:11px;color:#cbd5e1}.result .value{font-size:18px;font-weight:900;margin-top:3px}
+.tablewrap{overflow:auto}.table{width:100%;border-collapse:collapse;font-size:13px}.table th,.table td{text-align:left;padding:10px;border-bottom:1px solid var(--line);white-space:nowrap}
+.small{font-size:12px}.right{text-align:right}.hidden{display:none!important}.sectiontitle{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:10px}
+footer{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid var(--line);padding:9px;text-align:center;font-size:11px;color:var(--muted);z-index:15}
+@media(max-width:800px){.grid{grid-template-columns:1fr 1fr}.recipegrid{grid-template-columns:1fr 1fr}.resultgrid{grid-template-columns:1fr 1fr}}
+@media(max-width:560px){main{padding:12px}.grid,.grid2,.recipegrid,.resultgrid{grid-template-columns:1fr}.card{padding:13px}.itemtop{display:block}.itemtop .btnrow{margin-top:10px}}
+
+.checkgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:9px;margin:8px 0 16px}.checkgrid label{display:flex;align-items:center;gap:8px;background:#f8fafc;border:1px solid var(--line);border-radius:10px;padding:10px;margin:0}.checkgrid input{width:auto;margin:0}.photoGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:10px;margin-top:12px}.photoGrid img{width:100%;height:120px;object-fit:cover;border-radius:10px;border:1px solid var(--line)}.opportunity{border:1px solid var(--line);border-left:5px solid var(--accent);border-radius:12px;padding:16px;margin:12px 0;background:#fff}.opportunity.warn{border-left-color:var(--red)}.opportunity.good{border-left-color:var(--green)}.opportunity h3{margin:0 0 8px}.opportunity p{margin:6px 0}.opportunity .btn{margin-top:8px}
+.aiStudioCard{border:1px solid #c7d2fe;background:linear-gradient(135deg,#f8faff,#eef2ff)}#studioAiBtn:disabled{opacity:.65;cursor:wait}
+</style>
+
+<style>
+.stockBar{height:9px;background:#e8edf4;border-radius:99px;overflow:hidden;margin-top:9px}.stockBar span{display:block;height:100%;border-radius:99px}.stockNums{display:flex;justify-content:space-between;gap:10px;margin-top:7px;font-size:12px;color:#687386}.stockStatus{font-weight:900;font-size:12px}.stockCard{border-left:4px solid #cbd5e1}.stockCard.low{border-left-color:#d97706}.stockCard.out{border-left-color:#dc2626}.stockCard.ok{border-left-color:#16a34a}
+.aiStudioCard{border:1px solid #c7d2fe;background:linear-gradient(135deg,#f8faff,#eef2ff)}#studioAiBtn:disabled{opacity:.65;cursor:wait}
+</style>
+
+<style>
+.purchaseGroup{border:1px solid #e4e8ef;border-radius:14px;margin-bottom:12px;background:#fff;overflow:hidden}
+.purchaseHead{padding:12px 14px;background:#f8fafc;font-weight:900;display:flex;justify-content:space-between;gap:10px}
+.purchaseRow{padding:12px 14px;border-top:1px solid #eef1f5;display:flex;justify-content:space-between;gap:12px;align-items:center}
+.purchaseQty{font-weight:900}.buyBadge{background:#fee2e2;color:#991b1b;padding:4px 8px;border-radius:99px;font-size:11px;font-weight:900}
+@media print{header,footer,.btn,nav{display:none!important}.page{display:none!important}.page#page-compras{display:block!important}.app{max-width:none}.purchaseGroup{break-inside:avoid}}
+.aiStudioCard{border:1px solid #c7d2fe;background:linear-gradient(135deg,#f8faff,#eef2ff)}#studioAiBtn:disabled{opacity:.65;cursor:wait}
+</style>
+
+<style>
+.analysisRank{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center;padding:12px 0;border-bottom:1px solid #eef1f5}
+.analysisRank:last-child{border-bottom:0}.rankNum{font-size:18px;font-weight:900;width:30px}
+.rankName{font-weight:900}.rankMeta{font-size:12px;color:#687386;margin-top:3px}
+.rankBar{height:8px;background:#e8edf4;border-radius:99px;margin-top:7px;overflow:hidden}.rankBar span{display:block;height:100%;border-radius:99px}
+.rec{padding:11px 12px;border-radius:10px;margin-top:9px;font-size:13px;line-height:1.45}
+.rec.warn{background:#fef3c7;color:#92400e}.rec.good{background:#dcfce7;color:#166534}.rec.info{background:#eff6ff;color:#1d4ed8}
+@media(max-width:560px){.analysisRank{grid-template-columns:auto 1fr}.analysisRank>.pill{grid-column:2}}
+.aiStudioCard{border:1px solid #c7d2fe;background:linear-gradient(135deg,#f8faff,#eef2ff)}#studioAiBtn:disabled{opacity:.65;cursor:wait}
+</style>
+<style>
+.salesDay{display:flex;justify-content:space-between;gap:12px;padding:11px 0;border-bottom:1px solid #eef1f5}.salesDay:last-child{border-bottom:0}
+.salesProduct{display:flex;justify-content:space-between;gap:10px;padding:10px 0;border-bottom:1px solid #eef1f5}
+.salesProduct:last-child{border-bottom:0}
+.aiStudioCard{border:1px solid #c7d2fe;background:linear-gradient(135deg,#f8faff,#eef2ff)}#studioAiBtn:disabled{opacity:.65;cursor:wait}
+</style>
+
+<style>
+.progressOuter{height:13px;background:#e8edf4;border-radius:99px;overflow:hidden}.progressInner{height:100%;border-radius:99px;background:#2563eb}
+.dashList{padding:9px 0;border-bottom:1px solid #eef1f5;display:flex;justify-content:space-between;gap:10px}.dashList:last-child{border-bottom:0}
+.dashBar{height:7px;background:#e8edf4;border-radius:99px;overflow:hidden;margin-top:6px}.dashBar span{display:block;height:100%;border-radius:99px}
+.aiStudioCard{border:1px solid #c7d2fe;background:linear-gradient(135deg,#f8faff,#eef2ff)}#studioAiBtn:disabled{opacity:.65;cursor:wait}
+</style>
+<style>
+/* V7 — Premium UI layer */
+:root{
+ --primary:#0f172a;--accent:#2563eb;--accent2:#7c3aed;--soft:#f8fafc;
+}
+body{background:linear-gradient(180deg,#f7f9fc 0%,#eef2f7 100%)}
+header{background:linear-gradient(135deg,#0f172a 0%,#1e293b 60%,#312e81 100%);padding:24px 18px}
+.brand{letter-spacing:-.5px}.subtitle{color:#cbd5e1}
+nav{scrollbar-width:none}nav::-webkit-scrollbar{display:none}
+nav button{border-color:#ffffff25;background:#ffffff0c;transition:.18s}
+nav button:hover{background:#ffffff18;transform:translateY(-1px)}
+nav button.active{box-shadow:0 4px 14px #0003}
+.card{border:1px solid #e2e8f0;box-shadow:0 8px 24px #0f172a08;transition:.18s}
+.card:hover{box-shadow:0 10px 28px #0f172a0d}
+.kpi{letter-spacing:-.6px}
+.btn{transition:.16s;box-shadow:0 2px 5px #0f172a0b}
+.btn:hover{transform:translateY(-1px);box-shadow:0 5px 12px #0f172a16}
+.primary{background:linear-gradient(135deg,#0f172a,#334155)}
+.blue{background:linear-gradient(135deg,#2563eb,#4f46e5)}
+h1{letter-spacing:-.7px}
+.page>h1:first-child{margin-top:5px}
+.item{box-shadow:0 3px 10px #0f172a06}
+.tip{background:#f8fafc}
+.helpTitle{display:flex;align-items:center;gap:7px}
+.helpIcon{display:inline-flex;align-items:center;justify-content:center;width:19px;height:19px;border-radius:50%;background:#e0e7ff;color:#3730a3;font-size:11px;font-weight:900}
+.heroWelcome{background:linear-gradient(135deg,#111827,#312e81);color:#fff;border:0}
+.heroWelcome .muted{color:#dbeafe}
+.quickGrid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:14px}
+.quick{background:#ffffff12;border:1px solid #ffffff18;border-radius:12px;padding:12px}
+.quick b{display:block;font-size:13px}.quick span{display:block;font-size:11px;color:#cbd5e1;margin-top:3px}
+@media(max-width:700px){.quickGrid{grid-template-columns:1fr 1fr}}
+.aiStudioCard{border:1px solid #c7d2fe;background:linear-gradient(135deg,#f8faff,#eef2ff)}#studioAiBtn:disabled{opacity:.65;cursor:wait}
+</style>
+<style>
+.studioCanvasWrap{position:relative;background:#f1f5f9;border-radius:14px;min-height:180px;display:flex;align-items:center;justify-content:center;overflow:hidden}
+#studioCanvas{display:none;max-width:100%;max-height:520px;width:auto;height:auto;object-fit:contain;border-radius:12px}
+#studioEmpty{border:0;width:100%}.studioCanvasWrap.ready #studioCanvas{display:block}.studioCanvasWrap.ready #studioEmpty{display:none}
+#studioOverlay{width:auto!important}
+@media(max-width:700px){.studioCanvasWrap{min-height:150px}#studioCanvas{max-height:420px}}
+.aiStudioCard{border:1px solid #c7d2fe;background:linear-gradient(135deg,#f8faff,#eef2ff)}#studioAiBtn:disabled{opacity:.65;cursor:wait}
+</style>
+</head>
+<body>
+<header>
+ <div class="headerin">
+  <div class="brand">☕ Cafetería Pro V10</div>
+  <div class="subtitle">Controla costes, precios y rentabilidad de tu cafetería</div>
+  <nav id="nav"></nav>
+ </div>
+</header>
+
+<div class="app"><main>
+<section class="page active" id="page-inicio">
+ <div class="card heroWelcome">
+  <div class="sectiontitle">
+   <div><h1>☕ Tu cafetería, bajo control</h1><div class="muted">Todo lo importante en un solo lugar.</div></div>
+   <button class="btn light" onclick="showPage('ventas')">💳 Registrar venta</button>
+  </div>
+  <div class="quickGrid">
+   <div class="quick"><b>💰 Costes</b><span>Controla tu margen</span></div>
+   <div class="quick"><b>📦 Stock</b><span>Evita quedarte sin producto</span></div>
+   <div class="quick"><b>🛒 Compras</b><span>Compra solo lo necesario</span></div>
+   <div class="quick"><b>📊 Ventas</b><span>Decide con datos reales</span></div>
+  </div>
+ </div>
+
+ <div class="card">
+  <div class="grid2">
+   <div><label>Periodo</label><select id="dashPeriod" onchange="renderDashboard()"><option value="7">Últimos 7 días</option><option value="30" selected>Últimos 30 días</option><option value="365">Últimos 12 meses</option><option value="all">Todas las ventas</option></select></div>
+   <div><label>Objetivo mensual</label><div class="tip" id="dashGoalText">Introduce un objetivo en 📈 Objetivos.</div></div>
+  </div>
+ </div>
+
+ <div class="grid">
+  <div class="card"><div class="muted">Facturación</div><div class="kpi" id="dashRevenue">0,00 €</div></div>
+  <div class="card"><div class="muted">Beneficio estimado</div><div class="kpi" id="dashProfit">0,00 €</div></div>
+  <div class="card"><div class="muted">Margen real</div><div class="kpi" id="dashMargin">0,0%</div></div>
+  <div class="card"><div class="muted">Unidades vendidas</div><div class="kpi" id="dashUnits">0</div></div>
+  <div class="card"><div class="muted">Ticket medio</div><div class="kpi" id="dashTicket">0,00 €</div></div>
+  <div class="card"><div class="muted">Ventas registradas</div><div class="kpi" id="dashTransactions">0</div></div>
+ </div>
+
+ <div class="card">
+  <div class="helpTitle"><h2>🧭 Tu ruta rápida</h2><span class="helpIcon">?</span></div>
+  <div class="grid2">
+   <div><b>1. 🧺 Ingredientes</b><div class="small">Guarda lo que compras y su precio.</div></div>
+   <div><b>2. 🍽️ Productos</b><div class="small">Crea las recetas y calcula su rentabilidad.</div></div>
+   <div><b>3. 📦 Stock</b><div class="small">Indica cuánto tienes y tu mínimo.</div></div>
+   <div><b>4. 💳 Ventas</b><div class="small">Registra ventas para alimentar el Dashboard.</div></div>
+  </div>
+ </div>
+
+ <div class="card">
+  <h2>🎯 Progreso del objetivo mensual</h2>
+  <div id="dashProgress"></div>
+ </div>
+
+ <div class="grid2">
+  <div class="card"><h2>🏆 Productos que más venden</h2><div id="dashTopProducts"></div></div>
+  <div class="card"><h2>💰 Productos que más beneficio generan</h2><div id="dashTopProfit"></div></div>
+ </div>
+
+ <div class="card">
+  <h2>📅 Evolución</h2>
+  <div id="dashDays"></div>
+ </div>
+</section>
+
+<section class="page" id="page-ingredientes">
+ <div class="sectiontitle"><div><h1>🧺 Ingredientes</h1><div class="muted">Tu base de precios de compra.</div></div><button class="btn blue" onclick="openIngredientForm()">+ Nuevo</button></div>
+ <div id="ingredientForm" class="card hidden"></div><div id="ingredientsList"></div>
+</section>
+
+<section class="page" id="page-productos">
+ <div class="sectiontitle"><div><h1>🍽️ Productos</h1><div class="muted">Calcula el coste real de cada producto.</div></div><button class="btn blue" onclick="openProductForm()">+ Nuevo</button></div>
+ <div id="productForm" class="card hidden"></div><div id="productsList"></div>
+</section>
+
+<section class="page" id="page-objetivos">
+ <h1>📈 Objetivos</h1><p class="muted">Calcula tu punto de equilibrio y cuánto necesitas vender para alcanzar un beneficio.</p>
+ <div class="card">
+  <div class="grid2">
+   <div><label>Gastos fijos mensuales (€) <span class="helpIcon">?</span></label><input id="goalFixed" inputmode="decimal" placeholder="Ej. 3000"><div class="tip">Alquiler, autónomo, seguros, gestoría, luz y otros gastos que pagas aunque vendas poco.</div></div>
+   <div><label>Precio medio por venta (€) <span class="helpIcon">?</span></label><input id="goalTicket" inputmode="decimal" placeholder="Ej. 6"><div class="tip">Una estimación de lo que cobras de media por cada venta.</div></div>
+   <div><label>Margen medio (%) <span class="helpIcon">?</span></label><input id="goalMargin" inputmode="decimal" placeholder="Ej. 50"><div class="tip">Se puede calcular automáticamente usando tus productos.</div></div>
+   <div><label>Beneficio mensual deseado (€) <span class="helpIcon">?</span></label><input id="goalProfit" inputmode="decimal" placeholder="Ej. 3000"><div class="tip">Lo que quieres que quede después de cubrir los gastos fijos.</div></div>
+  </div>
+  <div class="btnrow"><button class="btn light" onclick="useAverageData()">Usar datos de mis productos</button><button class="btn primary" onclick="calculateGoal()">Calcular</button></div>
+  <div id="goalResult"></div>
+ </div>
+</section>
+
+<section class="page" id="page-gastos">
+ <div class="sectiontitle"><div><h1>💸 Gastos fijos</h1><div class="muted">Guarda tus gastos mensuales para utilizarlos en tus objetivos.</div></div><button class="btn blue" onclick="openExpenseForm()">+ Nuevo</button></div>
+ <div id="expenseForm" class="card hidden"></div><div id="expensesList"></div>
+ <div class="card"><b>Total mensual: <span id="expenseTotal">0,00 €</span></b><div class="tip">Este total se puede copiar automáticamente al apartado Objetivos.</div><button class="btn light" style="margin-top:10px" onclick="sendExpensesToGoal()">Usar total en Objetivos</button></div>
+</section>
+
+
+<section class="page" id="page-stock">
+ <div class="sectiontitle">
+  <div><h1>📦 Stock</h1><div class="muted">Controla cuánto tienes, el mínimo que necesitas y cuándo comprar.</div></div>
+  <button class="btn blue" onclick="openStockForm()">+ Nuevo</button>
+ </div>
+ <div class="card">
+  <div class="grid2">
+   <div><label>Buscar ingrediente</label><input id="stockSearch" placeholder="Ej. Café" oninput="renderStock()"></div>
+   <div><label>Filtro</label><select id="stockFilter" onchange="renderStock()"><option value="all">Todos</option><option value="low">⚠️ Bajo</option><option value="ok">🟢 Correcto</option><option value="out">🔴 Sin stock</option></select></div>
+  </div>
+ </div>
+ <div id="stockForm" class="card hidden"></div>
+ <div id="stockList"></div>
+</section>
+
+
+<section class="page" id="page-compras">
+ <div class="sectiontitle">
+  <div><h1>🛒 Compras</h1><div class="muted">Lista automática de ingredientes que necesitan reposición.</div></div>
+  <button class="btn blue" onclick="printShoppingList()">🖨️ Imprimir</button>
+ </div>
+ <div class="card">
+  <h2>🚚 Proveedores</h2>
+  <div class="tip">El proveedor se guarda en cada ingrediente desde 📦 Stock. Así la lista queda organizada para comprar.</div>
+ </div>
+ <div id="shoppingList"></div>
+</section>
+
+
+<section class="page" id="page-ventas">
+ <div class="sectiontitle">
+  <div><h1>💳 Ventas</h1><div class="muted">Registra ventas y descubre cuánto facturas y qué productos funcionan mejor.</div></div>
+  <button class="btn blue" onclick="openSaleForm()">+ Registrar venta</button>
+ </div>
+
+ <div class="grid">
+  <div class="card"><div class="muted">Ventas registradas</div><div class="kpi" id="salesCount">0</div></div>
+  <div class="card"><div class="muted">Facturación registrada</div><div class="kpi" id="salesRevenue">0,00 €</div></div>
+  <div class="card"><div class="muted">Beneficio estimado</div><div class="kpi" id="salesProfit">0,00 €</div></div>
+ </div>
+
+ <div class="card">
+  <h2>📅 Resumen</h2>
+  <div id="salesSummary"></div>
+ </div>
+
+ <div id="saleForm" class="card hidden"></div>
+ <div class="card">
+  <h2>🧾 Últimas ventas</h2>
+  <div id="salesList"></div>
+ </div>
+</section>
+
+<section class="page" id="page-personalizar">
+ <div class="card heroWelcome"><h1>🎨 Personaliza tu cafetería</h1><p class="muted">Cuéntanos qué vendes y qué quieres conseguir. Así las recomendaciones y las ideas de contenido serán más útiles para tu negocio.</p></div>
+ <div class="card"><h2>🏪 Tu negocio</h2>
+  <div class="grid2"><div><label>Nombre de la cafetería</label><input id="bizName" placeholder="Ej. Café del Puerto"></div>
+  <div><label>Tipo de negocio</label><select id="bizType"><option value="Cafetería">Cafetería</option><option value="Café de especialidad">Café de especialidad</option><option value="Bar de tapas">Bar de tapas</option><option value="Brunch">Brunch</option><option value="Chill out">Chill out</option><option value="Restaurante-cafetería">Restaurante-cafetería</option><option value="Otro">Otro</option></select></div></div>
+  <label>¿Qué vendes? (puedes marcar varias opciones)</label><div class="checkgrid" id="bizCategories"><label><input type="checkbox" value="Desayunos"> Desayunos</label><label><input type="checkbox" value="Café"> Café</label><label><input type="checkbox" value="Brunch"> Brunch</label><label><input type="checkbox" value="Tostadas y bocadillos"> Tostadas y bocadillos</label><label><input type="checkbox" value="Tapas"> Tapas</label><label><input type="checkbox" value="Comidas"> Comidas</label><label><input type="checkbox" value="Hamburguesas"> Hamburguesas</label><label><input type="checkbox" value="Pizzas"> Pizzas</label><label><input type="checkbox" value="Dulces y tartas"> Dulces y tartas</label><label><input type="checkbox" value="Cócteles"> Cócteles</label><label><input type="checkbox" value="Eventos"> Eventos</label><label><input type="checkbox" value="Otros productos"> Otros</label></div>
+  <label>¿Qué quieres mejorar?</label><div class="checkgrid" id="bizGoals"><label><input type="checkbox" value="Atraer más clientes"> Atraer más clientes</label><label><input type="checkbox" value="Vender más desayunos"> Vender más desayunos</label><label><input type="checkbox" value="Aumentar reservas"> Aumentar reservas</label><label><input type="checkbox" value="Vender productos rentables"> Vender productos rentables</label><label><input type="checkbox" value="Promocionar eventos"> Promocionar eventos</label><label><input type="checkbox" value="Mejorar Instagram"> Mejorar Instagram</label></div>
+  <div class="grid2"><div><label>Estilo de marca</label><select id="bizStyle"><option>Moderno</option><option>Elegante</option><option>Marinero</option><option>Minimalista</option><option>Rústico</option><option>Divertido y colorido</option><option>Premium</option></select></div><div><label>Color principal</label><input id="bizColor" type="color" value="#2563eb" style="height:46px;padding:4px"></div></div>
+  <label>Instagram, web o redes sociales (opcional)</label><input id="bizSocial" placeholder="@micafeteria o enlace">
+  <label>Cuéntanos algo más sobre tu negocio (opcional)</label><textarea id="bizNotes" rows="3" placeholder="Zona, tipo de cliente, especialidades, horarios…"></textarea>
+  <div class="btnrow"><button class="btn primary" onclick="saveBusinessProfile()">💾 Guardar mi perfil</button><button class="btn light" onclick="loadBusinessProfile()">Recargar datos guardados</button></div><div id="bizMsg" class="tip">Los datos del perfil se guardan en este dispositivo.</div>
+ </div>
+ <div class="card"><h2>📸 Fotos y materiales</h2><p class="muted">Sube aquí tus fotos y después mejóralas en el Estudio de fotos. Los archivos se procesan en tu dispositivo.</p><button class="btn primary" onclick="showPage('estudio')">Abrir Estudio de fotos →</button></div>
+</section>
+<section class="page" id="page-estudio">
+ <div class="card heroWelcome"><h1>📸 Estudio de fotos</h1><p class="muted">Mejora la presentación de tus platos y bebidas sin salir de Cafetería Pro. Sube una foto, elige un estilo y descarga el resultado.</p></div>
+ <div class="card">
+  <h2>1. Sube una foto</h2><label>Foto de un plato, bebida o local</label><input id="studioFile" type="file" accept="image/*" onchange="loadStudioImage(event)"><div class="tip">Consejo: utiliza una foto nítida, con buena luz y sin filtros fuertes. Tu foto original no se modifica.</div>
+ </div>
+ <div class="card aiStudioCard">
+  <h2>✨ Mejora automática con inteligencia artificial</h2>
+  <p class="muted">Sube una foto y deja que la IA mejore la presentación, la iluminación y el fondo. La imagen original no se modifica.</p>
+  <div class="grid2"><div><label for="studioAiMode">Nivel de transformación</label><select id="studioAiMode"><option value="natural">🌿 Natural: mejora suave y fiel al producto</option><option value="professional" selected>📸 Profesional: acabado publicitario</option><option value="radical">🔥 Transformación radical: estilo de anuncio</option></select></div><div><label for="studioAiNotes">Indicaciones adicionales (opcional)</label><input id="studioAiNotes" placeholder="Ej. fondo mediterráneo, luz cálida"></div></div>
+  <div class="btnrow"><button id="studioAiBtn" class="btn primary" onclick="enhanceStudioWithAI()">✨ MEJORAR FOTO CON IA</button><button class="btn light" onclick="restoreStudioOriginal()">↩️ Volver a la foto original</button></div>
+  <div id="studioAiMsg" class="tip">Para activar la edición con IA, ejecuta Cafetería Pro desde el pequeño servidor incluido en el paquete y configura una clave API en el servidor. Nunca pegues la clave aquí.</div>
+ </div>
+ <div class="grid2">
+  <div class="card"><h2>2. Ajustes manuales rápidos</h2><div class="btnrow"><button class="btn light" onclick="applyStudioPreset('natural')">🌿 Natural</button><button class="btn light" onclick="applyStudioPreset('food')">🍔 Comida apetecible</button><button class="btn light" onclick="applyStudioPreset('bright')">☀️ Más luminosa</button><button class="btn light" onclick="applyStudioPreset('warm')">🧡 Cálida</button><button class="btn light" onclick="applyStudioPreset('elegant')">✨ Elegante</button><button class="btn light" onclick="applyStudioPreset('reset')">↩️ Original</button></div>
+   <label>Brillo <span id="brightVal">100%</span></label><input id="studioBright" type="range" min="70" max="140" value="100" oninput="updateStudioValue('studioBright','brightVal','%');renderStudio()">
+   <label>Contraste <span id="contrastVal">100%</span></label><input id="studioContrast" type="range" min="70" max="140" value="100" oninput="updateStudioValue('studioContrast','contrastVal','%');renderStudio()">
+   <label>Color <span id="satVal">110%</span></label><input id="studioSat" type="range" min="50" max="160" value="110" oninput="updateStudioValue('studioSat','satVal','%');renderStudio()">
+   <label>Calidez <span id="warmVal">0</span></label><input id="studioWarm" type="range" min="-30" max="30" value="0" oninput="updateStudioValue('studioWarm','warmVal','');renderStudio()">
+  </div>
+  <div class="card"><h2>3. Vista previa</h2><div class="studioCanvasWrap"><canvas id="studioCanvas" width="900" height="900"></canvas><div id="studioEmpty" class="empty">Tu foto mejorada aparecerá aquí.</div></div><div class="btnrow"><button class="btn primary" onclick="downloadStudioImage()">⬇️ Descargar foto mejorada</button><button class="btn light" onclick="resetStudioControls()">Restablecer ajustes</button></div><div id="studioMsg" class="tip">Sube una imagen para empezar. La descarga se guarda en formato PNG.</div></div>
+ </div>
+ <div class="card"><h2>4. Crear una imagen promocional</h2><p class="muted">Añade el nombre del producto y un mensaje corto para convertir la foto en una pieza sencilla para redes.</p><div class="grid2"><div><label>Nombre del producto</label><input id="studioTitle" placeholder="Ej. Tosta de salmón"></div><div><label>Precio (opcional)</label><input id="studioPrice" placeholder="Ej. 8,50 €"></div></div><label>Mensaje corto (opcional)</label><input id="studioSubtitle" placeholder="Ej. Tu desayuno favorito te espera"><label><input id="studioOverlay" type="checkbox" checked style="width:auto;margin-right:8px">Añadir texto sobre la foto</label><button class="btn blue" onclick="renderStudio()">Actualizar diseño</button><div class="tip">Puedes combinar el resultado de la IA con ajustes manuales y texto promocional. La generación por IA requiere conexión a internet y puede tener un coste por imagen según el proveedor y la cuenta configurada.</div></div>
+</section>
+<section class="page" id="page-oportunidades">
+ <div class="card heroWelcome"><h1>🧠 Oportunidades para ganar más</h1><p class="muted">Ideas prácticas basadas en los costes, márgenes y ventas que hayas registrado. Son orientaciones, no garantías de ventas.</p><button class="btn primary" onclick="renderOpportunities()">Actualizar recomendaciones</button></div>
+ <div id="opportunityList"></div>
+ <div class="card"><h2>✍️ Preparar una publicación</h2><p class="muted">Elige un producto y generaremos un borrador editable para tus redes. Revísalo antes de publicarlo.</p><div class="grid2"><div><label>Producto</label><select id="promoProduct"></select></div><div><label>Objetivo</label><select id="promoGoal"><option>Dar a conocer el producto</option><option>Aumentar las ventas</option><option>Promocionar una novedad</option><option>Invitar a visitar el local</option></select></div></div><button class="btn primary" onclick="makePromoDraft()">✨ Crear borrador</button><label>Texto para editar</label><textarea id="promoDraft" rows="7" placeholder="Aquí aparecerá tu borrador…"></textarea><button class="btn light" onclick="copyPromoDraft()">📋 Copiar texto</button><div id="promoMsg" class="tip"></div></div>
+</section>
+
+<section class="page" id="page-analisis">
+ <h1>📊 Análisis profesional</h1>
+ <p class="muted">Descubre qué productos son más rentables y cuáles necesitan revisión.</p>
+
+ <div class="grid">
+  <div class="card"><div class="muted">Mejor margen</div><div class="kpi" id="analysisBestMargin">0%</div><div class="small" id="analysisBestName">—</div></div>
+  <div class="card"><div class="muted">Mayor beneficio / venta</div><div class="kpi" id="analysisBestProfit">0,00 €</div><div class="small" id="analysisBestProfitName">—</div></div>
+  <div class="card"><div class="muted">Productos a revisar</div><div class="kpi" id="analysisReviewCount">0</div><div class="small">Margen inferior al 30%</div></div>
+ </div>
+
+ <div class="card">
+  <h2>🏆 Ranking de rentabilidad</h2>
+  <div class="tip">El ranking usa el margen por venta. Un margen alto no siempre significa mayor beneficio en euros.</div>
+  <div id="analysisRanking"></div>
+ </div>
+
+ <div class="card">
+  <h2>💡 Recomendaciones</h2>
+  <div id="analysisRecommendations"></div>
+ </div>
+</section>
+</main></div>
+<footer>Los datos se guardan en este dispositivo. No necesitas una cuenta para usar esta versión.</footer>
+
+<script>
+'use strict';
+const KEY={ingredients:'cp_full_ingredients',products:'cp_full_products',expenses:'cp_full_expenses',goal:'cp_full_goal'};
+let ingredients=load(KEY.ingredients,[]);
+let products=load(KEY.products,[]);
+let expenses=load(KEY.expenses,[]);
+let editingIngredient=null, editingProduct=null;
+
+function load(k,f){try{const x=JSON.parse(localStorage.getItem(k));return Array.isArray(x)?x:f}catch(e){return f}}
+function save(k,v){localStorage.setItem(k,JSON.stringify(v))}
+function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,8)}
+function n(v){if(v===null||v===undefined||v==='')return 0;return Number(String(v).replace(/\s/g,'').replace(',','.'))||0}
+function money(v){return (Number(v)||0).toLocaleString('es-ES',{minimumFractionDigits:2,maximumFractionDigits:2})+' €'}
+function esc(v){return String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]))}
+function units(){return ['g','kg','ml','l','ud']}
+function compatible(a,b){if(a==='ud'||b==='ud')return a===b; if((a==='g'||a==='kg')&&(b==='g'||b==='kg'))return true;if((a==='ml'||a==='l')&&(b==='ml'||b==='l'))return true;return false}
+function base(q,u){if(u==='kg')return q*1000;if(u==='l')return q*1000;return q}
+function marginClass(m){return m<30?'low':m<50?'mid':'good'}
+function marginLabel(m){return m<30?'⚠️ Margen bajo':m<50?'🟡 Margen mejorable':'🟢 Buen margen'}
+function avgMargin(){if(!products.length)return 0;return products.reduce((s,p)=>s+(Number(p.margin)||0),0)/products.length}
+
+const navItems=[['inicio','🏠 Inicio'],['personalizar','🎨 Mi cafetería'],['estudio','📸 Estudio de fotos'],['oportunidades','🧠 Oportunidades'],['ingredientes','🧺 Ingredientes'],['productos','🍽️ Productos'],['objetivos','📈 Objetivos'],['gastos','💸 Gastos'],['analisis','📊 Análisis'],['stock','📦 Stock'],['compras','🛒 Compras'],['ventas','💳 Ventas']];
+function buildNav(){document.getElementById('nav').innerHTML=navItems.map(x=>`<button data-page="${x[0]}">${x[1]}</button>`).join('');document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>showPage(b.dataset.page))}
+function showPage(p){document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));document.getElementById('page-'+p).classList.add('active');document.querySelectorAll('nav button').forEach(x=>x.classList.toggle('active',x.dataset.page===p));renderAll();window.scrollTo(0,0)}
+
+function renderAll(){renderDashboard();renderIngredients();renderProducts();renderExpenses();renderStock();renderShopping();renderSales();renderAnalysis();renderOpportunities();refreshPromoProducts()}
+function renderHome(){document.getElementById('kpiProducts').textContent=products.length;document.getElementById('kpiIngredients').textContent=ingredients.length;document.getElementById('kpiMargin').innerHTML=avgMargin().toFixed(1)+'% <small>'+marginLabel(avgMargin())+'</small>'}
+
+function openIngredientForm(id=null){
+ editingIngredient=id;
+ const x=id?ingredients.find(i=>i.id===id):{name:'',unit:'g',pack:'',price:''};
+ const box=document.getElementById('ingredientForm');box.classList.remove('hidden');
+ box.innerHTML=`<h2>${id?'✏️ Editar ingrediente':'🧺 Nuevo ingrediente'}</h2>
+ <label>Nombre</label><input id="iName" value="${esc(x.name)}" placeholder="Ej. Café">
+ <div class="grid2"><div><label>Cantidad del envase <span class="helpIcon">?</span></label><input id="iPack" inputmode="decimal" value="${esc(x.pack)}" placeholder="Ej. 1"><div class="tip">Es el contenido total que compras. 1 kg = 1000 g · 1 L = 1000 ml.</div></div>
+ <div><label>Unidad</label><select id="iUnit">${units().map(u=>`<option ${x.unit===u?'selected':''}>${u}</option>`).join('')}</select></div></div>
+ <label>Precio del envase (€) <span class="helpIcon">?</span></label><input id="iPrice" inputmode="decimal" value="${esc(x.price)}" placeholder="Ej. 18,50">
+ <div class="tip">Ejemplo: compras 1 kg de café por 18 €. En la receta podrás indicar que usas 8 g.</div>
+ <div id="iMsg"></div><div class="btnrow"><button class="btn primary" onclick="saveIngredient()">Guardar</button><button class="btn light" onclick="closeIngredientForm()">Cancelar</button></div>`;
+ document.getElementById('iName').focus();
+}
+function closeIngredientForm(){editingIngredient=null;document.getElementById('ingredientForm').classList.add('hidden')}
+function saveIngredient(){
+ const name=document.getElementById('iName').value.trim(),pack=n(document.getElementById('iPack').value),unit=document.getElementById('iUnit').value,price=n(document.getElementById('iPrice').value),msg=document.getElementById('iMsg');
+ if(!name||pack<=0||price<0){msg.innerHTML='<div class="alert err">⚠️ Completa nombre, cantidad de envase y precio correctamente.</div>';return}
+ if(editingIngredient){const x=ingredients.find(i=>i.id===editingIngredient);Object.assign(x,{name,pack,unit,price})}
+ else ingredients.push({id:uid(),name,pack,unit,price});
+ save(KEY.ingredients,ingredients);closeIngredientForm();renderAll()
+}
+function renderIngredients(){
+ const box=document.getElementById('ingredientsList');
+ if(!ingredients.length){box.innerHTML='<div class="empty">Aún no tienes ingredientes. Pulsa “+ Nuevo”.</div>';return}
+ box.innerHTML=ingredients.map(i=>`<div class="item"><div class="itemtop"><div><div class="itemname">${esc(i.name)}</div><div class="itemmeta">${i.pack} ${i.unit} · ${money(i.price)} por envase</div></div><div class="btnrow"><button class="btn light" onclick="openIngredientForm('${i.id}')">Editar</button><button class="btn danger" onclick="deleteIngredient('${i.id}')">Eliminar</button></div></div></div>`).join('')
+}
+function deleteIngredient(id){if(!confirm('¿Eliminar este ingrediente? Las recetas guardadas conservarán sus datos, pero ya no se actualizarán desde este ingrediente.'))return;ingredients=ingredients.filter(x=>x.id!==id);save(KEY.ingredients,ingredients);renderAll()}
+
+function ingredientOptions(selected){
+ return '<option value="manual">— Introducir manualmente —</option>'+ingredients.map(i=>`<option value="${i.id}" ${String(i.id)===String(selected)?'selected':''}>${esc(i.name)}</option>`).join('')
+}
+function recipeRow(r={}){
+ const row=document.createElement('div');row.className='recipe';
+ row.innerHTML=`<button class="btn danger remove" type="button">✕</button>
+ <div class="recipegrid">
+ <div><label>Ingrediente</label><select class="rSelect">${ingredientOptions(r.ingredientId)}</select></div>
+ <div><label>Cantidad usada <span class="helpIcon">?</span></label><input class="rUsed" inputmode="decimal" value="${esc(r.used??'')}" placeholder="Ej. 8"></div>
+ <div><label>Unidad</label><select class="rUsedUnit">${units().map(u=>`<option ${r.usedUnit===u?'selected':''}>${u}</option>`).join('')}</select></div>
+ <div><label>Envase</label><input class="rPack" inputmode="decimal" value="${esc(r.pack??'')}" placeholder="Ej. 1000"></div>
+ </div>
+ <div class="grid2"><div><label>Unidad envase</label><select class="rPackUnit">${units().map(u=>`<option ${r.packUnit===u?'selected':''}>${u}</option>`).join('')}</select></div>
+ <div><label>Precio envase (€)</label><input class="rPrice" inputmode="decimal" value="${esc(r.price??'')}" placeholder="Ej. 18"></div></div>
+ <div class="tip">❓ Cantidad usada = lo que utilizas para <b>una venta</b>. Ej.: 8 g de café, 150 ml de leche o 1 ud de croissant.</div>`;
+ row.querySelector('.remove').onclick=()=>row.remove();
+ const select=row.querySelector('.rSelect');
+ select.onchange=()=>syncRow(row);
+ if(r.ingredientId)syncRow(row);
+ return row;
+}
+function syncRow(row){
+ const id=row.querySelector('.rSelect').value;if(id==='manual')return;
+ const ing=ingredients.find(x=>String(x.id)===String(id));if(!ing)return;
+ row.querySelector('.rPack').value=ing.pack;row.querySelector('.rPackUnit').value=ing.unit;row.querySelector('.rPrice').value=ing.price;
+}
+function readRow(row){
+ syncRow(row);
+ return {ingredientId:row.querySelector('.rSelect').value,name:ingredients.find(i=>String(i.id)===String(row.querySelector('.rSelect').value))?.name||'',used:n(row.querySelector('.rUsed').value),usedUnit:row.querySelector('.rUsedUnit').value,pack:n(row.querySelector('.rPack').value),packUnit:row.querySelector('.rPackUnit').value,price:n(row.querySelector('.rPrice').value)}
+}
+function calcRecipe(rs){
+ let cost=0;
+ for(const r of rs){
+  if(!r.name||r.used<=0||r.pack<=0||r.price<0)throw new Error('Completa todos los datos de los ingredientes.');
+  if(!compatible(r.usedUnit,r.packUnit))throw new Error(`Unidades incompatibles en ${r.name}: ${r.usedUnit} y ${r.packUnit}.`);
+  if(base(r.used,r.usedUnit)>base(r.pack,r.packUnit))throw new Error(`En ${r.name}, la cantidad usada no puede ser mayor que el envase.`);
+  cost+=r.price*(base(r.used,r.usedUnit)/base(r.pack,r.packUnit));
+ }
+ return cost
+}
+function openProductForm(id=null){
+ editingProduct=id;
+ const p=id?products.find(x=>x.id===id):{name:'',salePrice:'',target:50,ingredients:[]};
+ const box=document.getElementById('productForm');box.classList.remove('hidden');
+ box.innerHTML=`<h2>${id?'✏️ Editar producto':'🍽️ Nuevo producto'}</h2>
+ <label>Nombre del producto</label><input id="pName" value="${esc(p.name)}" placeholder="Ej. Café con leche">
+ <div class="grid2"><div><label>Precio de venta (€)</label><input id="pSale" inputmode="decimal" value="${esc(p.salePrice)}" placeholder="Ej. 2,50"></div>
+ <div><label>Objetivo de coste de ingredientes (%) <span class="helpIcon">?</span></label><input id="pTarget" inputmode="decimal" value="${esc(p.target??50)}"><div class="tip">50% significa que buscas que el coste de ingredientes represente como máximo la mitad del precio de venta.</div></div></div>
+ <div class="sectiontitle" style="margin-top:18px"><h3>Ingredientes de la receta</h3><button class="btn light" type="button" onclick="addRecipe()">+ Añadir ingrediente</button></div>
+ <div id="recipeRows"></div><div id="pResult"></div>
+ <div class="btnrow"><button class="btn blue" onclick="calculateProduct()">Calcular</button><button class="btn primary" onclick="saveProduct()">Guardar</button><button class="btn light" onclick="closeProductForm()">Cancelar</button></div>`;
+ const rr=document.getElementById('recipeRows');
+ (p.ingredients?.length?p.ingredients:[{}]).forEach(r=>rr.appendChild(recipeRow(r)));
+ if(id)showProductCalculation(p);
+}
+function closeProductForm(){editingProduct=null;document.getElementById('productForm').classList.add('hidden')}
+function addRecipe(){document.getElementById('recipeRows').appendChild(recipeRow({}))}
+function collectProduct(){
+ const name=document.getElementById('pName').value.trim(),sale=n(document.getElementById('pSale').value),target=n(document.getElementById('pTarget').value);
+ const rows=[...document.querySelectorAll('#recipeRows .recipe')].map(readRow);
+ if(!name)throw new Error('Escribe el nombre del producto.');
+ if(sale<=0)throw new Error('El precio de venta debe ser mayor que 0.');
+ if(target<=0||target>=100)throw new Error('El objetivo de coste debe estar entre 1% y 99%.');
+ if(!rows.length)throw new Error('Añade al menos un ingrediente.');
+ return {name,sale,target,ingredients:rows}
+}
+function productNumbers(data){
+ const cost=calcRecipe(data.ingredients),profit=data.sale-cost,margin=profit/data.sale*100,recommended=cost/(data.target/100);
+ return {cost,profit,margin,recommended}
+}
+function calculateProduct(){
+ const box=document.getElementById('pResult');try{const d=collectProduct(),r=productNumbers(d);box.innerHTML=`<div class="result"><div class="resultgrid"><div><div class="label">Coste</div><div class="value">${money(r.cost)}</div></div><div><div class="label">Beneficio</div><div class="value">${money(r.profit)}</div></div><div><div class="label">Margen</div><div class="value">${r.margin.toFixed(1)}%</div></div><div><div class="label">Precio recomendado</div><div class="value">${money(r.recommended)}</div></div></div></div>`}catch(e){box.innerHTML='<div class="alert err">⚠️ '+esc(e.message)+'</div>'}}
+function showProductCalculation(p){
+ if(!p.cost&&p.cost!==0)return;document.getElementById('pResult').innerHTML=`<div class="result"><div class="resultgrid"><div><div class="label">Coste</div><div class="value">${money(p.cost)}</div></div><div><div class="label">Beneficio</div><div class="value">${money(p.profit)}</div></div><div><div class="label">Margen</div><div class="value">${Number(p.margin).toFixed(1)}%</div></div><div><div class="label">Precio recomendado</div><div class="value">${money(p.recommended)}</div></div></div></div>`
+}
+function saveProduct(){
+ try{
+  const d=collectProduct(),r=productNumbers(d);
+  if(editingProduct){const p=products.find(x=>x.id===editingProduct);Object.assign(p,d,{salePrice:d.sale,cost:r.cost,profit:r.profit,margin:r.margin,recommended:r.recommended})}
+  else products.push({id:uid(),...d,salePrice:d.sale,cost:r.cost,profit:r.profit,margin:r.margin,recommended:r.recommended});
+  save(KEY.products,products);closeProductForm();renderAll();
+ }catch(e){document.getElementById('pResult').innerHTML='<div class="alert err">⚠️ '+esc(e.message)+'</div>'}
+}
+function renderProducts(){
+ const box=document.getElementById('productsList');if(!products.length){box.innerHTML='<div class="empty">Aún no tienes productos. Pulsa “+ Nuevo”.</div>';return}
+ box.innerHTML=products.map(p=>`<div class="item"><div class="itemtop"><div><div class="itemname">${esc(p.name)}</div><div class="itemmeta">Venta ${money(p.salePrice)} · Coste ${money(p.cost)} · Beneficio ${money(p.profit)}</div><span class="pill ${marginClass(p.margin)}">${marginLabel(p.margin)} · ${Number(p.margin).toFixed(1)}%</span></div><div class="btnrow"><button class="btn light" onclick="openProductForm('${p.id}')">Editar</button><button class="btn danger" onclick="deleteProduct('${p.id}')">Eliminar</button></div></div></div>`).join('')
+}
+function deleteProduct(id){if(!confirm('¿Eliminar este producto?'))return;products=products.filter(x=>x.id!==id);save(KEY.products,products);renderAll()}
+
+function openExpenseForm(id=null){
+ const x=id?expenses.find(e=>e.id===id):{name:'',amount:''};
+ const box=document.getElementById('expenseForm');box.classList.remove('hidden');box.innerHTML=`<h2>${id?'✏️ Editar gasto':'💸 Nuevo gasto fijo'}</h2><label>Concepto</label><input id="eName" value="${esc(x.name)}" placeholder="Ej. Alquiler"><label>Importe mensual (€)</label><input id="eAmount" inputmode="decimal" value="${esc(x.amount)}" placeholder="Ej. 1200"><div class="btnrow"><button class="btn primary" onclick="saveExpense('${id||''}')">Guardar</button><button class="btn light" onclick="document.getElementById('expenseForm').classList.add('hidden')">Cancelar</button></div>`
+}
+function saveExpense(id){
+ const name=document.getElementById('eName').value.trim(),amount=n(document.getElementById('eAmount').value);if(!name||amount<0)return alert('Completa concepto e importe.');
+ if(id){const x=expenses.find(e=>e.id===id);Object.assign(x,{name,amount})}else expenses.push({id:uid(),name,amount});save(KEY.expenses,expenses);document.getElementById('expenseForm').classList.add('hidden');renderAll()
+}
+function renderExpenses(){
+ const box=document.getElementById('expensesList');document.getElementById('expenseTotal').textContent=money(expenses.reduce((s,e)=>s+n(e.amount),0));
+ if(!expenses.length){box.innerHTML='<div class="empty">No has añadido gastos fijos. Ej.: alquiler, autónomo, seguros, gestoría.</div>';return}
+ box.innerHTML=expenses.map(e=>`<div class="item"><div class="itemtop"><div><div class="itemname">${esc(e.name)}</div><div class="itemmeta">${money(e.amount)} / mes</div></div><div class="btnrow"><button class="btn light" onclick="openExpenseForm('${e.id}')">Editar</button><button class="btn danger" onclick="deleteExpense('${e.id}')">Eliminar</button></div></div></div>`).join('')
+}
+function deleteExpense(id){expenses=expenses.filter(e=>e.id!==id);save(KEY.expenses,expenses);renderAll()}
+function sendExpensesToGoal(){document.getElementById('goalFixed').value=expenses.reduce((s,e)=>s+n(e.amount),0).toFixed(2);showPage('objetivos')}
+
+function useAverageData(){
+ if(!products.length)return alert('Primero crea al menos un producto.');
+ document.getElementById('goalMargin').value=avgMargin().toFixed(1);
+ const ticket=products.reduce((s,p)=>s+n(p.salePrice),0)/products.length;document.getElementById('goalTicket').value=ticket.toFixed(2);
+ const fixed=expenses.reduce((s,e)=>s+n(e.amount),0);if(fixed)document.getElementById('goalFixed').value=fixed.toFixed(2);
+}
+function calculateGoal(){
+ const fixed=n(document.getElementById('goalFixed').value),ticket=n(document.getElementById('goalTicket').value),margin=n(document.getElementById('goalMargin').value),desired=n(document.getElementById('goalProfit').value);
+ const box=document.getElementById('goalResult');
+ if(fixed<0||ticket<=0||margin<=0||margin>100||desired<0){box.innerHTML='<div class="alert err">⚠️ Revisa los datos. Precio medio y margen deben ser mayores que 0.</div>';return}
+ const contribution=ticket*margin/100,be=fixed/contribution,target=(fixed+desired)/contribution;
+ box.innerHTML=`<div class="result"><div class="resultgrid"><div><div class="label">Punto de equilibrio</div><div class="value">${Math.ceil(be)} ventas/mes</div></div><div><div class="label">Facturación equilibrio</div><div class="value">${money(be*ticket)}</div></div><div><div class="label">Ventas para tu objetivo</div><div class="value">${Math.ceil(target)} / mes</div></div><div><div class="label">Ventas aproximadas al día</div><div class="value">${Math.ceil(target/30)}</div></div></div><div class="tip" style="margin-top:12px">Esto es una estimación basada en el precio medio y margen que has introducido.</div></div>`;
+ save(KEY.goal,{fixed,ticket,margin,desired});
+}
+
+
+let stockItems=load('cp_full_stock',[]);
+
+function stockForIngredient(id){
+ const x=stockItems.find(s=>String(s.ingredientId)===String(id));
+ return x || {ingredientId:id,current:0,min:0,unit:(ingredients.find(i=>String(i.id)===String(id))||{}).unit||'ud',supplier:'',notes:''};
+}
+function stockStatus(s){
+ const current=n(s.current),min=n(s.min);
+ if(current<=0)return 'out';
+ if(current<=min)return 'low';
+ return 'ok';
+}
+function stockStatusText(st){
+ return st==='out'?'🔴 Sin stock':st==='low'?'⚠️ Comprar pronto':'🟢 Stock correcto';
+}
+function openStockForm(id=null){
+ const ing=ingredients.find(i=>String(i.id)===String(id));
+ if(!ing){alert('Primero crea el ingrediente en 🧺 Ingredientes.');return}
+ const s=stockForIngredient(id);
+ const box=document.getElementById('stockForm');box.classList.remove('hidden');
+ box.innerHTML=`<h2>📦 Stock: ${esc(ing.name)}</h2>
+ <div class="grid2">
+  <div><label>Stock actual <span class="helpIcon">?</span></label><input id="sCurrent" inputmode="decimal" value="${esc(s.current)}"><div class="tip">Cuánto tienes ahora mismo. Usa la misma unidad del envase: g, kg, ml, l o ud.</div></div>
+  <div><label>Stock mínimo <span class="helpIcon">?</span></label><input id="sMin" inputmode="decimal" value="${esc(s.min)}"><div class="tip">Cantidad a partir de la cual quieres recibir aviso de compra.</div></div>
+ </div>
+ <label>Proveedor</label><input id="sSupplier" value="${esc(s.supplier)}" placeholder="Ej. Makro">
+ <label>Notas</label><textarea id="sNotes" rows="2" placeholder="Ej. pedir los lunes">${esc(s.notes)}</textarea>
+ <div class="btnrow"><button class="btn primary" onclick="saveStock('${id}')">Guardar</button><button class="btn light" onclick="closeStockForm()">Cancelar</button></div>`;
+}
+function closeStockForm(){document.getElementById('stockForm').classList.add('hidden')}
+function saveStock(id){
+ const ing=ingredients.find(i=>String(i.id)===String(id));
+ const current=n(document.getElementById('sCurrent').value),min=n(document.getElementById('sMin').value);
+ if(current<0||min<0){alert('El stock no puede ser negativo.');return}
+ let s=stockItems.find(x=>String(x.ingredientId)===String(id));
+ if(!s){s={ingredientId:id};stockItems.push(s)}
+ Object.assign(s,{current,min,unit:ing.unit,supplier:document.getElementById('sSupplier').value.trim(),notes:document.getElementById('sNotes').value.trim()});
+ save('cp_full_stock',stockItems);closeStockForm();renderStock()
+}
+function renderStock(){
+ const box=document.getElementById('stockList');if(!box)return;
+ const search=(document.getElementById('stockSearch')?.value||'').trim().toLowerCase();
+ const filter=document.getElementById('stockFilter')?.value||'all';
+ let rows=ingredients.map(i=>({ing:i,s:stockForIngredient(i.id)}));
+ rows=rows.filter(x=>x.ing.name.toLowerCase().includes(search));
+ rows=rows.filter(x=>filter==='all'||stockStatus(x.s)===filter);
+ if(!rows.length){box.innerHTML='<div class="empty">No hay resultados. Crea ingredientes en 🧺 Ingredientes y después añade su stock.</div>';return}
+ box.innerHTML=rows.map(x=>{
+   const st=stockStatus(x.s),cur=n(x.s.current),min=n(x.s.min),max=Math.max(min,cur,1),pct=Math.min(100,cur/max*100);
+   return `<div class="item stockCard ${st}">
+    <div class="itemtop"><div style="flex:1">
+      <div class="itemname">${esc(x.ing.name)}</div>
+      <div class="stockNums"><span>Actual: <b>${cur} ${x.ing.unit}</b></span><span>Mínimo: <b>${min} ${x.ing.unit}</b></span></div>
+      <div class="stockBar"><span style="width:${pct}%"></span></div>
+      <div class="itemmeta"><span class="stockStatus">${stockStatusText(st)}</span>${x.s.supplier?' · Proveedor: '+esc(x.s.supplier):''}</div>
+      ${x.s.notes?'<div class="itemmeta">📝 '+esc(x.s.notes)+'</div>':''}
+    </div>
+    <div class="btnrow"><button class="btn light" onclick="openStockForm('${x.ing.id}')">Editar</button></div></div>
+   </div>`;
+ }).join('')
+}
+
+
+function shoppingRows(){
+ const rows=ingredients.map(i=>({ing:i,s:stockForIngredient(i.id)}));
+ return rows.filter(x=>n(x.s.current)<=n(x.s.min));
+}
+function renderShopping(){
+ const box=document.getElementById('shoppingList');if(!box)return;
+ const rows=shoppingRows();
+ if(!rows.length){
+   box.innerHTML='<div class="empty">🟢 No hay ingredientes pendientes de compra. Cuando el stock llegue al mínimo aparecerán aquí.</div>';
+   return;
+ }
+ const groups={};
+ rows.forEach(x=>{
+   const supplier=x.s.supplier||'Sin proveedor asignado';
+   (groups[supplier] ||= []).push(x);
+ });
+ box.innerHTML=Object.entries(groups).map(([supplier,items])=>`
+   <div class="purchaseGroup">
+    <div class="purchaseHead"><span>🚚 ${esc(supplier)}</span><span>${items.length} producto${items.length===1?'':'s'}</span></div>
+    ${items.map(x=>{
+      const current=n(x.s.current),min=n(x.s.min);
+      const buy=Math.max(0,min-current);
+      return `<div class="purchaseRow">
+       <div><b>${esc(x.ing.name)}</b><div class="small">Actual: ${current} ${x.ing.unit} · Mínimo: ${min} ${x.ing.unit}</div></div>
+       <div class="right"><span class="buyBadge">Comprar</span><div class="purchaseQty">≥ ${buy} ${x.ing.unit}</div></div>
+      </div>`;
+    }).join('')}
+   </div>`).join('');
+}
+function printShoppingList(){renderShopping();setTimeout(()=>window.print(),100)}
+
+
+let sales=load('cp_full_sales',[]);
+
+function openSaleForm(){
+ const box=document.getElementById('saleForm');box.classList.remove('hidden');
+ if(!products.length){
+   box.innerHTML='<div class="alert warn">⚠️ Primero crea al menos un producto en 🍽️ Productos.</div><button class="btn light" onclick="document.getElementById(\'saleForm\').classList.add(\'hidden\')">Cerrar</button>';
+   return;
+ }
+ box.innerHTML=`<h2>💳 Registrar venta</h2>
+ <div class="grid2">
+  <div><label>Producto</label><select id="saleProduct">${products.map(p=>`<option value="${p.id}">${esc(p.name)} · ${money(p.salePrice)}</option>`).join('')}</select></div>
+  <div><label>Cantidad vendida</label><input id="saleQty" inputmode="numeric" value="1" placeholder="Ej. 2"></div>
+ </div>
+ <label>Fecha</label><input id="saleDate" type="date" value="${new Date().toISOString().slice(0,10)}">
+ <div class="tip">La venta usa el precio y coste guardados del producto. Puedes registrar varias unidades de una vez.</div>
+ <div class="btnrow"><button class="btn primary" onclick="saveSale()">Guardar venta</button><button class="btn light" onclick="document.getElementById('saleForm').classList.add('hidden')">Cancelar</button></div>`;
+}
+function saveSale(){
+ const pid=document.getElementById('saleProduct').value,q=Math.floor(n(document.getElementById('saleQty').value)),date=document.getElementById('saleDate').value;
+ const p=products.find(x=>String(x.id)===String(pid));
+ if(!p||q<=0||!date){alert('Revisa producto, cantidad y fecha.');return}
+ sales.unshift({id:uid(),productId:p.id,productName:p.name,qty:q,unitPrice:n(p.salePrice),unitCost:n(p.cost),date});
+ save('cp_full_sales',sales);document.getElementById('saleForm').classList.add('hidden');renderSales()
+}
+function deleteSale(id){if(!confirm('¿Eliminar esta venta?'))return;sales=sales.filter(x=>x.id!==id);save('cp_full_sales',sales);renderSales()}
+function renderSales(){
+ const count=document.getElementById('salesCount');if(!count)return;
+ const revenue=sales.reduce((s,x)=>s+n(x.qty)*n(x.unitPrice),0);
+ const profit=sales.reduce((s,x)=>s+n(x.qty)*(n(x.unitPrice)-n(x.unitCost)),0);
+ count.textContent=sales.reduce((s,x)=>s+n(x.qty),0);
+ document.getElementById('salesRevenue').textContent=money(revenue);
+ document.getElementById('salesProfit').textContent=money(profit);
+
+ const days={};sales.forEach(x=>{days[x.date]??={qty:0,revenue:0,profit:0};days[x.date].qty+=n(x.qty);days[x.date].revenue+=n(x.qty)*n(x.unitPrice);days[x.date].profit+=n(x.qty)*(n(x.unitPrice)-n(x.unitCost))});
+ const dates=Object.keys(days).sort().reverse().slice(0,7);
+ document.getElementById('salesSummary').innerHTML=dates.length?dates.map(d=>`<div class="salesDay"><span><b>${new Date(d+'T12:00:00').toLocaleDateString('es-ES')}</b><br><span class="small">${days[d].qty} unidades</span></span><span class="right"><b>${money(days[d].revenue)}</b><br><span class="small">Beneficio ${money(days[d].profit)}</span></span></div>`).join(''):'<div class="empty">Aún no hay ventas registradas.</div>';
+
+ const list=document.getElementById('salesList');
+ list.innerHTML=sales.length?sales.slice(0,30).map(x=>`<div class="salesProduct"><div><b>${esc(x.productName)}</b><div class="small">${new Date(x.date+'T12:00:00').toLocaleDateString('es-ES')} · ${x.qty} ud. · ${money(x.unitPrice)} / ud.</div></div><button class="btn danger" onclick="deleteSale('${x.id}')">Eliminar</button></div>`).join(''):'<div class="empty">Aún no hay ventas registradas.</div>';
+}
+
+
+function salesInPeriod(days){
+ const now=new Date(); now.setHours(23,59,59,999);
+ if(days==='all')return sales.slice();
+ const cutoff=new Date();cutoff.setDate(cutoff.getDate()-Number(days)+1);cutoff.setHours(0,0,0,0);
+ return sales.filter(x=>{const d=new Date(x.date+'T12:00:00');return d>=cutoff&&d<=now});
+}
+function getGoalData(){return load(KEY.goal,null)}
+function renderDashboard(){
+ const days=document.getElementById('dashPeriod')?.value||'30';
+ const rows=salesInPeriod(days);
+ const revenue=rows.reduce((s,x)=>s+n(x.qty)*n(x.unitPrice),0);
+ const profit=rows.reduce((s,x)=>s+n(x.qty)*(n(x.unitPrice)-n(x.unitCost)),0);
+ const units=rows.reduce((s,x)=>s+n(x.qty),0);
+ const transactions=rows.length;
+ const margin=revenue?profit/revenue*100:0;
+ const ticket=transactions?revenue/transactions:0;
+ document.getElementById('dashRevenue').textContent=money(revenue);
+ document.getElementById('dashProfit').textContent=money(profit);
+ document.getElementById('dashMargin').textContent=margin.toFixed(1)+'%';
+ document.getElementById('dashUnits').textContent=units;
+ document.getElementById('dashTransactions').textContent=transactions;
+ document.getElementById('dashTicket').textContent=money(ticket);
+
+ const goal=getGoalData();
+ const goalRevenue=goal?(n(goal.fixed)+n(goal.desired))/(n(goal.margin)/100):0;
+ document.getElementById('dashGoalText').textContent=goalRevenue>0?'Objetivo aproximado de facturación: '+money(goalRevenue):'Introduce un objetivo en 📈 Objetivos.';
+ const progress=goalRevenue>0?Math.min(100,revenue/goalRevenue*100):0;
+ document.getElementById('dashProgress').innerHTML=goalRevenue>0?
+   `<div class="dashList"><span>Facturación del periodo</span><b>${money(revenue)}</b></div><div class="progressOuter"><div class="progressInner" style="width:${progress}%"></div></div><div class="small" style="margin-top:7px">${progress.toFixed(0)}% del objetivo de facturación</div>`:
+   '<div class="tip">💡 Ve a 📈 Objetivos, introduce tus gastos fijos, margen y beneficio deseado, y vuelve aquí.</div>';
+
+ const productMap={};
+ rows.forEach(x=>{
+   const key=x.productId||x.productName;
+   productMap[key]??={name:x.productName,units:0,revenue:0,profit:0};
+   productMap[key].units+=n(x.qty);productMap[key].revenue+=n(x.qty)*n(x.unitPrice);productMap[key].profit+=n(x.qty)*(n(x.unitPrice)-n(x.unitCost));
+ });
+ const topUnits=Object.values(productMap).sort((a,b)=>b.units-a.units).slice(0,5);
+ const topProfit=Object.values(productMap).sort((a,b)=>b.profit-a.profit).slice(0,5);
+ const maxU=Math.max(...topUnits.map(x=>x.units),1),maxP=Math.max(...topProfit.map(x=>x.profit),1);
+ document.getElementById('dashTopProducts').innerHTML=topUnits.length?topUnits.map((x,i)=>`<div class="dashList"><div><b>${i+1}. ${esc(x.name)}</b><div class="dashBar"><span style="width:${x.units/maxU*100}%"></span></div></div><b>${x.units}</b></div>`).join(''):'<div class="empty">Sin ventas en este periodo.</div>';
+ document.getElementById('dashTopProfit').innerHTML=topProfit.length?topProfit.map((x,i)=>`<div class="dashList"><div><b>${i+1}. ${esc(x.name)}</b><div class="small">${x.units} unidades</div><div class="dashBar"><span style="width:${Math.max(0,x.profit)/maxP*100}%"></span></div></div><b>${money(x.profit)}</b></div>`).join(''):'<div class="empty">Sin ventas en este periodo.</div>';
+
+ const byDay={};rows.forEach(x=>{byDay[x.date]??={revenue:0,profit:0,units:0};byDay[x.date].revenue+=n(x.qty)*n(x.unitPrice);byDay[x.date].profit+=n(x.qty)*(n(x.unitPrice)-n(x.unitCost));byDay[x.date].units+=n(x.qty)});
+ const dateList=Object.keys(byDay).sort().reverse().slice(0,14);
+ document.getElementById('dashDays').innerHTML=dateList.length?dateList.map(d=>`<div class="dashList"><span><b>${new Date(d+'T12:00:00').toLocaleDateString('es-ES')}</b><br><span class="small">${byDay[d].units} unidades</span></span><span class="right"><b>${money(byDay[d].revenue)}</b><br><span class="small">Beneficio ${money(byDay[d].profit)}</span></span></div>`).join(''):'<div class="empty">Registra ventas para ver la evolución.</div>';
+}
+
+function renderAnalysis(){
+ const ranking=document.getElementById('analysisRanking');
+ if(!ranking)return;
+ if(!products.length){
+   document.getElementById('analysisBestMargin').textContent='0%';
+   document.getElementById('analysisBestName').textContent='—';
+   document.getElementById('analysisBestProfit').textContent='0,00 €';
+   document.getElementById('analysisBestProfitName').textContent='—';
+   document.getElementById('analysisReviewCount').textContent='0';
+   ranking.innerHTML='<div class="empty">Crea productos para ver el análisis.</div>';
+   document.getElementById('analysisRecommendations').innerHTML='<div class="rec info">💡 Empieza creando 3–5 productos habituales de tu cafetería.</div>';
+   return;
+ }
+ const list=[...products].sort((a,b)=>(Number(b.margin)||0)-(Number(a.margin)||0));
+ const bestMargin=list[0], bestProfit=[...products].sort((a,b)=>(Number(b.profit)||0)-(Number(a.profit)||0))[0];
+ const review=list.filter(p=>(Number(p.margin)||0)<30);
+ document.getElementById('analysisBestMargin').textContent=Number(bestMargin.margin||0).toFixed(1)+'%';
+ document.getElementById('analysisBestName').textContent=bestMargin.name;
+ document.getElementById('analysisBestProfit').textContent=money(bestProfit.profit);
+ document.getElementById('analysisBestProfitName').textContent=bestProfit.name;
+ document.getElementById('analysisReviewCount').textContent=review.length;
+
+ const maxMargin=Math.max(...list.map(p=>Number(p.margin)||0),1);
+ ranking.innerHTML=list.map((p,i)=>{
+   const m=Number(p.margin)||0;
+   return `<div class="analysisRank">
+    <div class="rankNum">${i+1}</div>
+    <div>
+      <div class="rankName">${esc(p.name)}</div>
+      <div class="rankMeta">Venta ${money(p.salePrice)} · Coste ${money(p.cost)} · Beneficio ${money(p.profit)}</div>
+      <div class="rankBar"><span style="width:${Math.min(100,Math.max(0,m/maxMargin*100))}%"></span></div>
+    </div>
+    <span class="pill ${marginClass(m)}">${m.toFixed(1)}%</span>
+   </div>`;
+ }).join('');
+
+ let recs=[];
+ if(review.length) recs.push(`<div class="rec warn">⚠️ <b>${review.length} producto${review.length===1?'':'s'} con margen bajo.</b> Revisa el precio de venta o el coste de los ingredientes.</div>`);
+ const expensive=list.filter(p=>Number(p.cost)>Number(p.salePrice)*0.6);
+ if(expensive.length) recs.push(`<div class="rec warn">💰 ${expensive.length} producto${expensive.length===1?' tiene':'s tienen'} un coste de ingredientes superior al 60% del precio. Son candidatos prioritarios para revisar.</div>`);
+ if(bestMargin) recs.push(`<div class="rec good">🟢 <b>${esc(bestMargin.name)}</b> tiene el mejor margen (${Number(bestMargin.margin).toFixed(1)}%). Úsalo como referencia para estudiar otros productos.</div>`);
+ if(bestProfit) recs.push(`<div class="rec info">📌 <b>${esc(bestProfit.name)}</b> deja el mayor beneficio por venta: ${money(bestProfit.profit)}.</div>`);
+ if(!recs.length)recs.push('<div class="rec good">✅ Tus productos no presentan alertas importantes con los datos actuales.</div>');
+ document.getElementById('analysisRecommendations').innerHTML=recs.join('');
+}
+const BUSINESS_KEY='cp_business_profile_v8';
+function checkedValues(id){return [...document.querySelectorAll('#'+id+' input[type=checkbox]:checked')].map(x=>x.value)}
+function setCheckedValues(id,values=[]){document.querySelectorAll('#'+id+' input[type=checkbox]').forEach(x=>x.checked=values.includes(x.value))}
+function saveBusinessProfile(){
+ const profile={name:document.getElementById('bizName').value.trim(),type:document.getElementById('bizType').value,categories:checkedValues('bizCategories'),goals:checkedValues('bizGoals'),style:document.getElementById('bizStyle').value,color:document.getElementById('bizColor').value,social:document.getElementById('bizSocial').value.trim(),notes:document.getElementById('bizNotes').value.trim()};
+ try{localStorage.setItem(BUSINESS_KEY,JSON.stringify(profile));document.getElementById('bizMsg').textContent='✅ Perfil guardado. Puedes volver cuando quieras y editarlo.';renderOpportunities()}catch(e){document.getElementById('bizMsg').textContent='No se ha podido guardar el perfil en este dispositivo.'}
+}
+function loadBusinessProfile(){let p={};try{p=JSON.parse(localStorage.getItem(BUSINESS_KEY)||'{}')}catch(e){};document.getElementById('bizName').value=p.name||'';document.getElementById('bizType').value=p.type||'Cafetería';setCheckedValues('bizCategories',p.categories||[]);setCheckedValues('bizGoals',p.goals||[]);document.getElementById('bizStyle').value=p.style||'Moderno';document.getElementById('bizColor').value=p.color||'#2563eb';document.getElementById('bizSocial').value=p.social||'';document.getElementById('bizNotes').value=p.notes||'';document.getElementById('bizMsg').textContent='Perfil cargado.';}
+function previewBusinessFiles(event){const box=document.getElementById('bizPhotoPreview');box.innerHTML='';[...(event.target.files||[])].slice(0,12).forEach(file=>{if(!file.type.startsWith('image/'))return;const img=document.createElement('img');img.alt=file.name;img.title=file.name;img.src=URL.createObjectURL(file);box.appendChild(img)})}
+function refreshPromoProducts(){const el=document.getElementById('promoProduct');if(!el)return;const previous=el.value;el.innerHTML=products.length?products.map(p=>`<option value="${esc(p.id)}">${esc(p.name)}</option>`).join(''):'<option value="">Primero crea un producto</option>';if(products.some(p=>p.id===previous))el.value=previous}
+function renderOpportunities(){const box=document.getElementById('opportunityList');if(!box)return;let cards=[];let sold={};(sales||[]).forEach(s=>{const key=s.productId||s.product||s.name||'';sold[key]=(sold[key]||0)+(Number(s.qty)||Number(s.quantity)||1)});
+ const low=products.filter(p=>(Number(p.margin)||0)<30);low.forEach(p=>cards.push(`<div class="opportunity warn"><h3>⚠️ Revisa el margen de ${esc(p.name)}</h3><p>El margen registrado es <b>${(Number(p.margin)||0).toFixed(1)}%</b>. Comprueba el coste de los ingredientes y el precio de venta antes de hacer promociones.</p><button class="btn light" onclick="showPage('productos')">Revisar producto</button></div>`));
+ const profitable=products.filter(p=>(Number(p.margin)||0)>=50).sort((a,b)=>(Number(b.margin)||0)-(Number(a.margin)||0));profitable.slice(0,3).forEach(p=>{let count=sold[p.id]||sold[p.name]||0;cards.push(`<div class="opportunity good"><h3>💚 Destaca ${esc(p.name)}</h3><p>Tiene un margen registrado del <b>${(Number(p.margin)||0).toFixed(1)}%</b>${count?` y aparecen ${count} unidades vendidas en los registros disponibles`:' y todavía no hay ventas asociadas detectadas'}. Puedes probar una publicación y medir si mejora el resultado.</p><button class="btn primary" onclick="selectPromo('${String(p.id).replace(/'/g,'')}')">Crear borrador de publicación</button></div>`)});
+ const profile=(()=>{try{return JSON.parse(localStorage.getItem(BUSINESS_KEY)||'{}')}catch(e){return {}}})();if(profile.goals?.length)cards.push(`<div class="opportunity"><h3>🎯 Objetivos de tu cafetería</h3><p>Has indicado que quieres: <b>${profile.goals.map(esc).join(', ')}</b>. Enfoca las próximas publicaciones en estos objetivos y revisa después las ventas registradas.</p></div>`);
+ if(!products.length)cards.push('<div class="opportunity"><h3>👋 Empecemos por tus productos</h3><p>Guarda tus productos, costes y precios en el apartado Productos. Cuando registres ventas, podremos dar recomendaciones más útiles.</p><button class="btn primary" onclick="showPage(\'productos\')">Ir a Productos</button></div>');else if(!cards.length)cards.push('<div class="opportunity"><h3>📌 Siguiente paso</h3><p>Registra ventas y mantén actualizados los costes para recibir recomendaciones basadas en datos. No inventaremos resultados si faltan datos.</p><button class="btn light" onclick="showPage(\'ventas\')">Registrar ventas</button></div>');box.innerHTML=cards.join('')}
+function selectPromo(id){showPage('oportunidades');const el=document.getElementById('promoProduct');if(el)el.value=id;makePromoDraft()}
+function makePromoDraft(){const id=document.getElementById('promoProduct').value;const p=products.find(x=>x.id===id);const profile=(()=>{try{return JSON.parse(localStorage.getItem(BUSINESS_KEY)||'{}')}catch(e){return {}}})();if(!p){document.getElementById('promoMsg').textContent='Crea primero un producto en el apartado Productos.';return}const goal=document.getElementById('promoGoal').value;const biz=profile.name||'nuestro local';const categories=profile.categories?.length?profile.categories.join(', '):'nuestras especialidades';const style=profile.style||'cercano';const draft=`☕ ¡Ven a descubrir ${p.name} en ${biz}!\n\n${goal==='Promocionar una novedad'?'✨ Una propuesta que tienes que probar.':goal==='Invitar a visitar el local'?'📍 Te esperamos para disfrutar de un buen momento.':goal==='Aumentar las ventas'?'🤩 Date un capricho y disfruta de uno de nuestros favoritos.':'✨ Tenemos algo rico preparado para ti.'}\n\nNos encanta compartir ${categories} contigo.\n\n📍 Pásate por ${biz} y cuéntanos qué te parece.\n\n#Cafetería #PlanPerfecto #FoodLovers`;document.getElementById('promoDraft').value=draft;document.getElementById('promoMsg').textContent=`Borrador preparado con estilo ${style}. Ajusta los detalles y añade una foto real antes de publicar.`}
+async function copyPromoDraft(){const el=document.getElementById('promoDraft');try{await navigator.clipboard.writeText(el.value);document.getElementById('promoMsg').textContent='Texto copiado.'}catch(e){el.select();document.getElementById('promoMsg').textContent='Selecciona el texto y cópialo manualmente.'}}
+
+let studioImage=null, studioOriginalImage=null, studioOriginalFile=null, studioFileName='cafeteria-pro-foto';
+function loadStudioImage(event){const file=event.target.files&&event.target.files[0];if(!file)return;if(!file.type.startsWith('image/')){document.getElementById('studioMsg').textContent='Elige un archivo de imagen válido.';return}const reader=new FileReader();reader.onload=e=>{const img=new Image();img.onload=()=>{studioImage=img;studioOriginalImage=img;studioOriginalFile=file;studioFileName=(file.name||'foto').replace(/\.[^.]+$/,'');document.querySelector('.studioCanvasWrap').classList.add('ready');resetStudioControls();document.getElementById('studioMsg').textContent='Foto cargada. Puedes ajustar los controles o usar la mejora automática con IA.';document.getElementById('studioAiMsg').textContent='Foto lista. Elige el nivel de transformación y pulsa “Mejorar foto con IA”.'};img.onerror=()=>{document.getElementById('studioMsg').textContent='No se ha podido abrir esta imagen.'};img.src=e.target.result};reader.readAsDataURL(file)}
+function updateStudioValue(inputId,labelId,suffix){const v=document.getElementById(inputId).value;document.getElementById(labelId).textContent=v+suffix}
+function resetStudioControls(){['studioBright','studioContrast'].forEach(id=>document.getElementById(id).value=100);document.getElementById('studioSat').value=110;document.getElementById('studioWarm').value=0;updateStudioValue('studioBright','brightVal','%');updateStudioValue('studioContrast','contrastVal','%');updateStudioValue('studioSat','satVal','%');updateStudioValue('studioWarm','warmVal','');renderStudio()}
+function applyStudioPreset(p){const values={natural:[105,105,110,2],food:[108,115,128,8],bright:[120,105,108,0],warm:[105,105,112,18],elegant:[96,115,92,-5],reset:[100,100,100,0]}[p]||[100,100,100,0];['studioBright','studioContrast','studioSat','studioWarm'].forEach((id,i)=>document.getElementById(id).value=values[i]);updateStudioValue('studioBright','brightVal','%');updateStudioValue('studioContrast','contrastVal','%');updateStudioValue('studioSat','satVal','%');updateStudioValue('studioWarm','warmVal','');renderStudio()}
+function renderStudio(){if(!studioImage)return;const canvas=document.getElementById('studioCanvas'),ctx=canvas.getContext('2d');const max=1400,scale=Math.min(1,max/Math.max(studioImage.naturalWidth,studioImage.naturalHeight));canvas.width=Math.round(studioImage.naturalWidth*scale);canvas.height=Math.round(studioImage.naturalHeight*scale);const b=Number(document.getElementById('studioBright').value),c=Number(document.getElementById('studioContrast').value),sat=Number(document.getElementById('studioSat').value);ctx.save();ctx.filter=`brightness(${b}%) contrast(${c}%) saturate(${sat}%)`;ctx.drawImage(studioImage,0,0,canvas.width,canvas.height);ctx.restore();const warm=Number(document.getElementById('studioWarm').value);if(warm!==0){ctx.save();ctx.globalCompositeOperation=warm>0?'soft-light':'multiply';ctx.globalAlpha=Math.abs(warm)/100;ctx.fillStyle=warm>0?'#ffb15e':'#7aa9ff';ctx.fillRect(0,0,canvas.width,canvas.height);ctx.restore()}const overlay=document.getElementById('studioOverlay').checked;const title=document.getElementById('studioTitle').value.trim();const price=document.getElementById('studioPrice').value.trim();const subtitle=document.getElementById('studioSubtitle').value.trim();if(overlay&&(title||price||subtitle)){const h=canvas.height,w=canvas.width,pad=Math.max(18,Math.round(w*.045)),band=Math.round(h*.26);const grad=ctx.createLinearGradient(0,h-band,0,h);grad.addColorStop(0,'rgba(0,0,0,0)');grad.addColorStop(1,'rgba(0,0,0,0.78)');ctx.fillStyle=grad;ctx.fillRect(0,h-band,w,band);ctx.textAlign='left';ctx.textBaseline='bottom';ctx.fillStyle='#fff';ctx.shadowColor='#0008';ctx.shadowBlur=4;const maxWidth=w-pad*2;let fontSize=Math.max(22,Math.min(58,Math.round(w*.065)));ctx.font=`800 ${fontSize}px system-ui, sans-serif`;let t=title;while(t&&ctx.measureText(t).width>maxWidth&&fontSize>16){fontSize-=2;ctx.font=`800 ${fontSize}px system-ui, sans-serif`}if(t)ctx.fillText(t,pad,h-pad-(subtitle?fontSize+10:0),maxWidth);if(subtitle){ctx.font=`500 ${Math.max(15,Math.round(fontSize*.48))}px system-ui, sans-serif`;ctx.fillText(subtitle,pad,h-pad, maxWidth)}if(price){ctx.shadowBlur=0;const pw=Math.min(maxWidth,ctx.measureText(price).width+pad);ctx.fillStyle='#fff';ctx.fillRect(w-pad-pw,pad,pw,Math.max(40,fontSize+18));ctx.fillStyle='#111827';ctx.textAlign='center';ctx.font=`800 ${Math.max(18,Math.round(fontSize*.62))}px system-ui, sans-serif`;ctx.fillText(price,w-pad-pw/2,pad+Math.max(40,fontSize+18)/2+fontSize*.22,pw-pad/2)}ctx.restore()}document.getElementById('studioMsg').textContent='Vista previa actualizada. Descarga la imagen cuando estés conforme.'}
+async function enhanceStudioWithAI(){
+ const file=studioOriginalFile||document.getElementById('studioFile').files?.[0];
+ const msg=document.getElementById('studioAiMsg'),btn=document.getElementById('studioAiBtn');
+ if(!file){msg.textContent='Primero sube una foto.';return}
+ const mode=document.getElementById('studioAiMode').value;
+ const notes=document.getElementById('studioAiNotes').value.trim();
+ const product=document.getElementById('studioTitle')?.value.trim()||'';
+ const modeLabels={natural:'natural y fiel a la fotografía original',professional:'fotografía comercial profesional de alta calidad',radical:'transformación publicitaria radical, elegante e impactante'};
+ const fd=new FormData();fd.append('image',file);fd.append('mode',mode);fd.append('notes',notes);fd.append('product',product);
+ btn.disabled=true;btn.textContent='⏳ Mejorando foto…';msg.textContent='La IA está trabajando. Puede tardar un poco; no cierres esta página.';
+ try{
+   const response=await fetch('/api/enhance-photo',{method:'POST',body:fd});
+   const data=await response.json().catch(()=>({error:'Respuesta no válida del servidor.'}));
+   if(!response.ok)throw new Error(data.error||'No se ha podido mejorar la foto.');
+   if(!data.image)throw new Error('El servidor no ha devuelto la imagen editada.');
+   const img=new Image();img.onload=()=>{studioImage=img;studioFileName=(studioFileName||'foto')+'-ia';document.querySelector('.studioCanvasWrap').classList.add('ready');resetStudioControls();msg.textContent='✅ Foto mejorada con IA. Puedes descargarla o añadirle el nombre y el precio del producto.'};img.onerror=()=>{msg.textContent='La IA respondió, pero no se pudo abrir la imagen. Inténtalo de nuevo.'};img.src='data:image/png;base64,'+data.image;
+ }catch(err){msg.textContent='No se pudo completar la mejora: '+(err.message||'error desconocido')+'. Comprueba que abriste Cafetería Pro desde el servidor y que configuraste la clave API.'}
+ finally{btn.disabled=false;btn.textContent='✨ MEJORAR FOTO CON IA'}
+}
+function restoreStudioOriginal(){if(!studioOriginalImage){document.getElementById('studioAiMsg').textContent='Primero sube una foto.';return}studioImage=studioOriginalImage;studioFileName=(studioOriginalFile?.name||'cafeteria-pro-foto').replace(/\\.[^.]+$/,'');resetStudioControls();document.getElementById('studioAiMsg').textContent='Foto original restaurada. Puedes probar otro estilo de IA.'}
+function downloadStudioImage(){if(!studioImage){document.getElementById('studioMsg').textContent='Primero sube una foto.';return}renderStudio();const a=document.createElement('a');a.download=(studioFileName||'cafeteria-pro-foto')+'-mejorada.png';a.href=document.getElementById('studioCanvas').toDataURL('image/png');a.click();document.getElementById('studioMsg').textContent='Imagen descargada. Puedes usarla en tus redes o carta.'}
+
+function restoreGoal(){const g=load(KEY.goal,null);if(g){for(const [id,v] of Object.entries({goalFixed:g.fixed,goalTicket:g.ticket,goalMargin:g.margin,goalProfit:g.desired})){if(document.getElementById(id))document.getElementById(id).value=v}}}
+document.addEventListener('DOMContentLoaded',()=>{buildNav();restoreGoal();loadBusinessProfile();renderAll();document.querySelector('nav button').classList.add('active')});
+</script>
+</body>
+</html>
